@@ -3,6 +3,7 @@ package com.dkd.framework.web.exception;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -134,5 +135,26 @@ public class GlobalExceptionHandler
     public AjaxResult handleDemoModeException(DemoModeException e)
     {
         return AjaxResult.error("演示模式，不允许操作");
+    }
+
+    /**
+     * 数据完整性异常
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public AjaxResult handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        // 获取根异常
+        Throwable rootCause = e.getRootCause();
+        String errorMsg = rootCause != null ? rootCause.getMessage() : e.getMessage();
+
+        // 外键约束冲突：删除/修改被关联数据
+        if (errorMsg != null && (errorMsg.contains("foreign") || errorMsg.contains("FK_"))) {
+            return AjaxResult.error("无法删除，存在其他数据引用本条数据，请先删除关联数据！");
+        }
+        // 可以扩展：唯一索引冲突（duplicate entry）
+        if (errorMsg != null && errorMsg.contains("Duplicate entry")) {
+            return AjaxResult.error("数据重复，违反唯一约束！");
+        }
+
+        return AjaxResult.error("您的操作违反了数据库完整性约束");
     }
 }
