@@ -1,0 +1,14 @@
+.idea/
+.vscode/
+.claude/
+.DS_Store
+*.log
+
+# Local connection configuration (copy .example files before use)
+/back/dev-admin/src/main/resources/application.yml
+/back/dev-admin/src/main/resources/application-druid.yml
+/front/vite.config.js
+/front/.env.development
+/front/.env.production
+/front/.env.staging
+/back/dev-common/src/test/java/com/dev/common/test/Demo.java
